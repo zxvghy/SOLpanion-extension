@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "AI Page Assistant",
+  "version": "1.0",
+  "description": "Analyze pages using OpenAI",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

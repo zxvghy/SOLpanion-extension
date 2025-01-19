@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <div class="container">
+      <h2>AI Page Assistant</h2>
+      <div class="input-group">
+        <textarea 
+          id="promptInput" 
+          placeholder="Enter your prompt (max 200 characters)"
+          maxlength="200"
+        ></textarea>
+        <div class="char-count">
+          <span id="charCount">0</span>/200
+        </div>
+      </div>
+      <button id="analyzeButton">Analyze with AI</button>
+      <div id="loadingIndicator" class="loading hidden">
+        Processing...
+      </div>
+      <div id="result" class="result"></div>
+    </div>
+    <script src="../config.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
