@@ -1,0 +1,169 @@
+/* Base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f5f5f5;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Header styles */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  /* Search input */
+  .search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+    font-size: 14px;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+  
+  /* Buttons */
+  .button, .danger-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .button {
+    background: #007bff;
+    color: white;
+  }
+  
+  .button:hover {
+    background: #0056b3;
+  }
+  
+  .danger-button {
+    background: #dc3545;
+    color: white;
+  }
+  
+  .danger-button:hover {
+    background: #c82333;
+  }
+  
+  /* History list */
+  .history-list {
+    display: grid;
+    gap: 16px;
+  }
+  
+  .history-item {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .timestamp {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .url {
+    color: #007bff;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  .url:hover {
+    text-decoration: underline;
+  }
+  
+  .prompt {
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  
+  .response {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    font-size: 14px;
+  }
+  
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 48px 0;
+    color: #666;
+  }
+  
+  /* Dialog */
+  .dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dialog-content {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  
+  .hidden {
+    display: none;
+  }

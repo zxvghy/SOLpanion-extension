@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Assistant History</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>AI Assistant History</h1>
+      <div class="header-actions">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search prompts..."
+          class="search-input"
+        >
+        <button id="clearHistory" class="danger-button">Clear History</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div id="historyList" class="history-list">
+        <!-- History items will be inserted here -->
+      </div>
+    </main>
+
+    <!-- Confirm Dialog -->
+    <div id="confirmDialog" class="dialog hidden">
+      <div class="dialog-content">
+        <h2>Clear History</h2>
+        <p>Are you sure you want to clear all history? This cannot be undone.</p>
+        <div class="dialog-actions">
+          <button id="cancelClear" class="button">Cancel</button>
+          <button id="confirmClear" class="danger-button">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="dashboard.js"></script>
+</body>
+</html>
