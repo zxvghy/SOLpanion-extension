@@ -3,7 +3,7 @@
   "name": "AI Page Assistant",
   "version": "1.0",
   "description": "Analyze pages using OpenAI",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["https://api.openai.com/*"],
   "action": {
     "default_popup": "popup/popup.html"
