@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingIndicator = document.getElementById('loadingIndicator');
   const resultDiv = document.getElementById('result');
 
+  // Hide the result area initially
   resultDiv.classList.add('hidden');
 
+  // Update char count and disable button if no input
   promptInput.addEventListener('input', () => {
     const length = promptInput.value.length;
     charCount.textContent = length;
@@ -22,12 +24,32 @@ document.addEventListener('DOMContentLoaded', () => {
       resultDiv.textContent = '';
       resultDiv.classList.add('hidden');
 
+      // 1) Get active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      const [{ result: pageContent }] = await chrome.scripting.executeScript({
+
+      // 2) Inject Readability library files into the webpage
+      //    (Adjust filenames/paths to match your extension)
+      await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        function: getPageContent,
+        files: ['libs/JSDOMParser.js', 'libs/Readability.js']
       });
 
+      // 3) Run an inline function that uses Readability to parse the DOM
+      const [{ result: pageContent }] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          // This runs in the page context, where Readability is now injected
+          // (from the previous call)
+          const documentClone = document.cloneNode(true);
+          const readability = new Readability(documentClone);
+          const article = readability.parse();
+
+          // Return extracted text or fallback to innerText
+          return article ? article.textContent : document.body.innerText || '';
+        },
+      });
+
+      // 4) Send truncated content and user prompt to OpenAI
       const truncatedContent = pageContent.slice(0, config.MAX_CONTEXT_LENGTH);
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -41,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
           messages: [
             {
               role: 'system',
-              content: 'You are a helpful assistant that analyzes webpage content based on user prompts. Be concise and specific in your responses.'
+              content: 'You are a helpful assistant that analyzes webpage content. Be concise and specific in your responses.'
             },
             {
               role: 'user',
@@ -57,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(data.error.message);
       }
 
+      // 5) Display AI response
       const aiResponse = data.choices[0].message.content.trim();
       if (aiResponse) {
         resultDiv.textContent = aiResponse;
@@ -71,18 +94,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-function getPageContent() {
-  const clone = document.body.cloneNode(true);
-  const scripts = clone.getElementsByTagName('script');
-  const styles = clone.getElementsByTagName('style');
-  
-  while (scripts[0]) {
-    scripts[0].parentNode.removeChild(scripts[0]);
-  }
-  while (styles[0]) {
-    styles[0].parentNode.removeChild(styles[0]);
-  }
-  
-  return clone.innerText;
-}
