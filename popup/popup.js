@@ -1,62 +1,117 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Tab switching functionality
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Remove active class from all buttons and contents
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      document.getElementById(`${button.dataset.tab}Tab`).classList.add('active');
+    });
+  });
+
+  // Analyze tab functionality
   const promptInput = document.getElementById('promptInput');
   const charCount = document.getElementById('charCount');
   const analyzeButton = document.getElementById('analyzeButton');
   const loadingIndicator = document.getElementById('loadingIndicator');
   const resultDiv = document.getElementById('result');
 
-  // Hide the result area initially
-  resultDiv.classList.add('hidden');
-
-  // Update char count and disable button if no input
   promptInput.addEventListener('input', () => {
     const length = promptInput.value.length;
     charCount.textContent = length;
     analyzeButton.disabled = length === 0;
   });
 
+  // Settings tab functionality
+  const apiKeyInput = document.getElementById('apiKey');
+  const toggleVisibilityBtn = document.getElementById('toggleVisibility');
+  const saveKeyBtn = document.getElementById('saveKey');
+  const statusDiv = document.getElementById('status');
+
+  // Load saved API key if it exists
+  const { apiKey } = await chrome.storage.sync.get('apiKey');
+  if (apiKey) {
+    apiKeyInput.value = apiKey;
+  }
+
+  // Toggle API key visibility
+  toggleVisibilityBtn.addEventListener('click', () => {
+    const isPassword = apiKeyInput.type === 'password';
+    apiKeyInput.type = isPassword ? 'text' : 'password';
+    toggleVisibilityBtn.textContent = isPassword ? 'Hide' : 'Show';
+  });
+
+  // Save API key
+  saveKeyBtn.addEventListener('click', async () => {
+    const apiKey = apiKeyInput.value.trim();
+    
+    if (!apiKey) {
+      showStatus('Please enter an API key', 'error');
+      return;
+    }
+
+    try {
+      await chrome.storage.sync.set({ apiKey });
+      showStatus('API key saved successfully', 'success');
+    } catch (error) {
+      showStatus('Error saving API key', 'error');
+    }
+  });
+
+  function showStatus(message, type) {
+    statusDiv.textContent = message;
+    statusDiv.className = `status ${type}`;
+    setTimeout(() => {
+      statusDiv.className = 'status hidden';
+    }, 3000);
+  }
+
+  // Analyze functionality
   analyzeButton.addEventListener('click', async () => {
     const prompt = promptInput.value.trim();
     if (!prompt) return;
 
     try {
+      const { apiKey } = await chrome.storage.sync.get('apiKey');
+      
+      if (!apiKey) {
+        throw new Error('Please set your OpenAI API key in the Settings tab');
+      }
+
       loadingIndicator.classList.remove('hidden');
       resultDiv.textContent = '';
       resultDiv.classList.add('hidden');
 
-      // 1) Get active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-      // 2) Inject Readability library files into the webpage
-      //    (Adjust filenames/paths to match your extension)
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ['libs/JSDOMParser.js', 'libs/Readability.js']
       });
 
-      // 3) Run an inline function that uses Readability to parse the DOM
       const [{ result: pageContent }] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          // This runs in the page context, where Readability is now injected
-          // (from the previous call)
           const documentClone = document.cloneNode(true);
           const readability = new Readability(documentClone);
           const article = readability.parse();
-
-          // Return extracted text or fallback to innerText
           return article ? article.textContent : document.body.innerText || '';
         },
       });
 
-      // 4) Send truncated content and user prompt to OpenAI
       const truncatedContent = pageContent.slice(0, config.MAX_CONTEXT_LENGTH);
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.OPENAI_API_KEY}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: config.MODEL,
@@ -79,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(data.error.message);
       }
 
-      // 5) Display AI response
       const aiResponse = data.choices[0].message.content.trim();
       if (aiResponse) {
         resultDiv.textContent = aiResponse;

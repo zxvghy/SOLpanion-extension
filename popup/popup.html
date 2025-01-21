@@ -8,26 +8,52 @@
       <h2>AI Page Assistant</h2>
     </header>
     
-    <div class="container">
-      <div class="input-group">
-        <textarea 
-          id="promptInput" 
-          placeholder="Enter your prompt (max 200 characters)"
-          maxlength="200"
-        ></textarea>
-        <div class="char-count">
-          <span id="charCount">0</span>/200
-        </div>
-      </div>
-      
-      <button id="analyzeButton">Analyze with AI</button>
+    <div class="tab-navigation">
+      <button class="tab-button active" data-tab="analyze">Analyze</button>
+      <button class="tab-button" data-tab="settings">Settings</button>
+    </div>
 
-      <div id="loadingIndicator" class="loading hidden">
-        Processing...
+    <div class="container">
+      <!-- Analyze Tab -->
+      <div id="analyzeTab" class="tab-content active">
+        <div class="input-group">
+          <textarea 
+            id="promptInput" 
+            placeholder="Enter your prompt (max 200 characters)"
+            maxlength="200"
+          ></textarea>
+          <div class="char-count">
+            <span id="charCount">0</span>/200
+          </div>
+        </div>
+        
+        <button id="analyzeButton">Analyze with AI</button>
+
+        <div id="loadingIndicator" class="loading hidden">
+          Processing...
+        </div>
+        
+        <div id="result" class="result hidden"></div>
       </div>
-      
-      <!-- Result hidden by default -->
-      <div id="result" class="result hidden"></div>
+
+      <!-- Settings Tab -->
+      <div id="settingsTab" class="tab-content">
+        <div class="settings-group">
+          <label for="apiKey">OpenAI API Key:</label>
+          <div class="api-key-input">
+            <input 
+              type="password" 
+              id="apiKey" 
+              placeholder="Enter your OpenAI API Key"
+            >
+            <button id="toggleVisibility" class="icon-button">
+              Show
+            </button>
+          </div>
+          <button id="saveKey">Save API Key</button>
+        </div>
+        <div id="status" class="status hidden"></div>
+      </div>
     </div>
 
     <script src="../config.js"></script>
