@@ -4,8 +4,11 @@
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <div class="container">
+    <header class="header">
       <h2>AI Page Assistant</h2>
+    </header>
+    
+    <div class="container">
       <div class="input-group">
         <textarea 
           id="promptInput" 
@@ -16,12 +19,17 @@
           <span id="charCount">0</span>/200
         </div>
       </div>
+      
       <button id="analyzeButton">Analyze with AI</button>
+
       <div id="loadingIndicator" class="loading hidden">
         Processing...
       </div>
-      <div id="result" class="result"></div>
+      
+      <!-- Result hidden by default -->
+      <div id="result" class="result hidden"></div>
     </div>
+
     <script src="../config.js"></script>
     <script src="popup.js"></script>
   </body>
