@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Open dashboard in new tab
   openDashboard.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'dashboard/dashboard.html' });
+    // This will open dashboard.html in a new tab, but not override all new tabs
+    chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/dashboard.html') });
   });
 
   // Analyze functionality

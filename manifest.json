@@ -7,9 +7,6 @@
   "host_permissions": ["https://api.openai.com/*"],
   "action": {
     "default_popup": "popup/popup.html"
-  },
-  "chrome_url_overrides": {
-    "newtab": "dashboard/dashboard.html"
   },  
   "background": {
     "service_worker": "background.js"
