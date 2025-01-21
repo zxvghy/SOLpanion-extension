@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingIndicator = document.getElementById('loadingIndicator');
   const resultDiv = document.getElementById('result');
 
+  resultDiv.classList.add('hidden');
+
   promptInput.addEventListener('input', () => {
     const length = promptInput.value.length;
     charCount.textContent = length;
@@ -18,17 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       loadingIndicator.classList.remove('hidden');
       resultDiv.textContent = '';
-      
-      // Get current page content
+      resultDiv.classList.add('hidden');
+
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       const [{ result: pageContent }] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         function: getPageContent,
       });
 
-      // Prepare content for OpenAI
       const truncatedContent = pageContent.slice(0, config.MAX_CONTEXT_LENGTH);
-      
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -39,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
           model: config.MODEL,
           messages: [
             {
-              "role": "system",
-              "content": "You are a helpful assistant that analyzes webpage content based on user prompts. Be concise and specific in your responses."
+              role: 'system',
+              content: 'You are a helpful assistant that analyzes webpage content based on user prompts. Be concise and specific in your responses.'
             },
             {
-              "role": "user",
-              "content": `Page Content: ${truncatedContent}\n\nPrompt: ${prompt}`
+              role: 'user',
+              content: `Page Content: ${truncatedContent}\n\nPrompt: ${prompt}`
             }
           ],
           max_tokens: 500
@@ -56,9 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(data.error.message);
       }
 
-      resultDiv.textContent = data.choices[0].message.content;
+      const aiResponse = data.choices[0].message.content.trim();
+      if (aiResponse) {
+        resultDiv.textContent = aiResponse;
+        resultDiv.classList.remove('hidden');
+      }
+
     } catch (error) {
       resultDiv.textContent = `Error: ${error.message}`;
+      resultDiv.classList.remove('hidden');
     } finally {
       loadingIndicator.classList.add('hidden');
     }
@@ -66,13 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function getPageContent() {
-  // Remove script and style elements to get clean text
   const clone = document.body.cloneNode(true);
   const scripts = clone.getElementsByTagName('script');
   const styles = clone.getElementsByTagName('style');
   
-  while (scripts[0]) scripts[0].parentNode.removeChild(scripts[0]);
-  while (styles[0]) styles[0].parentNode.removeChild(styles[0]);
+  while (scripts[0]) {
+    scripts[0].parentNode.removeChild(scripts[0]);
+  }
+  while (styles[0]) {
+    styles[0].parentNode.removeChild(styles[0]);
+  }
   
   return clone.innerText;
 }
