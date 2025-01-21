@@ -72,6 +72,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 3000);
   }
 
+  // Add history functionality
+  const openDashboard = document.getElementById('openDashboard');
+  const recentPrompts = document.getElementById('recentPrompts');
+
+  // Function to load recent prompts
+  async function loadRecentPrompts() {
+    try {
+      const { promptHistory = [] } = await chrome.storage.sync.get('promptHistory');
+      
+      recentPrompts.innerHTML = promptHistory
+        .slice(0, 3) // Show only last 3 prompts
+        .map(item => `
+          <div class="history-item">
+            <div class="history-prompt">${item.prompt}</div>
+            <div class="history-timestamp">
+              ${new Date(item.timestamp).toLocaleDateString()}
+            </div>
+          </div>
+        `)
+        .join('') || '<div class="empty-history">No recent prompts</div>';
+    } catch (error) {
+      console.error('Error loading recent prompts:', error);
+      recentPrompts.innerHTML = '<div class="error">Error loading history</div>';
+    }
+  }
+
+  // Open dashboard in new tab
+  openDashboard.addEventListener('click', () => {
+    chrome.tabs.create({ url: 'dashboard/dashboard.html' });
+  });
+
   // Analyze functionality
   analyzeButton.addEventListener('click', async () => {
     const prompt = promptInput.value.trim();
@@ -136,8 +167,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const aiResponse = data.choices[0].message.content.trim();
       if (aiResponse) {
+        // Save to history
+        const { promptHistory = [] } = await chrome.storage.sync.get('promptHistory');
+        const newHistory = [{
+          prompt,
+          response: aiResponse,
+          url: tab.url,
+          timestamp: Date.now()
+        }, ...promptHistory].slice(0, 100); // Keep last 100 items
+
+        await chrome.storage.sync.set({ promptHistory: newHistory });
+
         resultDiv.textContent = aiResponse;
         resultDiv.classList.remove('hidden');
+        // Refresh recent prompts if on history tab
+        if (document.querySelector('[data-tab="history"]').classList.contains('active')) {
+          await loadRecentPrompts();
+        }
       }
 
     } catch (error) {
@@ -147,4 +193,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadingIndicator.classList.add('hidden');
     }
   });
+
+  // Load recent prompts when history tab is clicked
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (button.dataset.tab === 'history') {
+        loadRecentPrompts();
+      }
+    });
+  });
+
+  // Initial load of recent prompts if starting on history tab
+  if (document.querySelector('[data-tab="history"]').classList.contains('active')) {
+    await loadRecentPrompts();
+  }
 });
