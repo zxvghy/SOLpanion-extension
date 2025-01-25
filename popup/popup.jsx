@@ -87,32 +87,33 @@ const Popup = () => {
   // Check DEX page when DEX tab is selected
   useEffect(() => {
     const checkDexPage = async () => {
-      if (activeTab === 'dex') {
-        try {
-          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-          
-          if (!tab.url || !validateDexUrl(tab.url)) {
-            setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
-            setDexStatusType('error');
-            setIsDexTokenVisible(false);
-            return;
-          }
-
-          const { chainType, pairAddress } = extractDexDetails(tab.url);
-
-          setChainType(chainType);
-          setPairAddress(pairAddress);
-          setDexStatus('');
-          setDexStatusType('success');
-        } catch (error) {
-          setDexStatus('Error checking current tab');
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        
+        if (!tab.url || !validateDexUrl(tab.url)) {
+          setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
           setDexStatusType('error');
+          setIsDexTokenVisible(false);
+          return;
         }
+
+        const { chainType, pairAddress } = extractDexDetails(tab.url);
+
+        setChainType(chainType);
+        setPairAddress(pairAddress);
+        setDexStatus('');
+        setDexStatusType('success');
+
+        // Fetch token details on page load
+        await fetchTokenDetails();
+      } catch (error) {
+        setDexStatus('Error checking current tab');
+        setDexStatusType('error');
       }
     };
 
     checkDexPage();
-  }, [activeTab]);
+  }, []);
 
   // Load API key on mount
   useEffect(() => {
@@ -329,14 +330,7 @@ const Popup = () => {
               </div>
             )}
 
-            {chainType && pairAddress && !isDexTokenVisible && (
-              <button
-                onClick={fetchTokenDetails}
-                className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
-              >
-                Fetch Token Details
-              </button>
-            )}
+            {/* Removed the "Fetch Token Details" button */}
           </div>
         )}
 

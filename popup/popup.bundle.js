@@ -190,7 +190,7 @@ optgroup,
 select,
 textarea {
   font-family: inherit; /* 1 */
-  font-feature-: inherit; /* 1 */
+  font-feature-settings: inherit; /* 1 */
   font-variation-settings: inherit; /* 1 */
   font-size: 100%; /* 1 */
   font-weight: inherit; /* 1 */
@@ -36187,34 +36187,35 @@ const Popup = () => {
   // Check DEX page when DEX tab is selected
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     const checkDexPage = async () => {
-      if (activeTab === 'dex') {
-        try {
-          const [tab] = await chrome.tabs.query({
-            active: true,
-            currentWindow: true
-          });
-          if (!tab.url || !validateDexUrl(tab.url)) {
-            setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
-            setDexStatusType('error');
-            setIsDexTokenVisible(false);
-            return;
-          }
-          const {
-            chainType,
-            pairAddress
-          } = extractDexDetails(tab.url);
-          setChainType(chainType);
-          setPairAddress(pairAddress);
-          setDexStatus('');
-          setDexStatusType('success');
-        } catch (error) {
-          setDexStatus('Error checking current tab');
+      try {
+        const [tab] = await chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        });
+        if (!tab.url || !validateDexUrl(tab.url)) {
+          setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
           setDexStatusType('error');
+          setIsDexTokenVisible(false);
+          return;
         }
+        const {
+          chainType,
+          pairAddress
+        } = extractDexDetails(tab.url);
+        setChainType(chainType);
+        setPairAddress(pairAddress);
+        setDexStatus('');
+        setDexStatusType('success');
+
+        // Fetch token details on page load
+        await fetchTokenDetails();
+      } catch (error) {
+        setDexStatus('Error checking current tab');
+        setDexStatusType('error');
       }
     };
     checkDexPage();
-  }, [activeTab]);
+  }, []);
 
   // Load API key on mount
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -36427,10 +36428,6 @@ const Popup = () => {
               children: "Address:"
             }), " ", tokenInfo.address]
           })]
-        }), chainType && pairAddress && !isDexTokenVisible && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
-          onClick: fetchTokenDetails,
-          className: "w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors",
-          children: "Fetch Token Details"
         })]
       }), activeTab === 'history' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
         className: "space-y-4",
