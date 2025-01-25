@@ -10,8 +10,10 @@
     
     <div class="tab-navigation">
       <button class="tab-button active" data-tab="analyze">Analyze</button>
+      <button class="tab-button" data-tab="dex">DEX / Photon</button>  <!-- New DEX tab -->
       <button class="tab-button" data-tab="settings">Settings</button>
       <button class="tab-button" data-tab="history">History</button>  <!-- New tab button -->
+      
     </div>
 
     <div class="container">
@@ -35,6 +37,21 @@
         </div>
         
         <div id="result" class="result hidden"></div>
+      </div>
+
+      <div id="dexTab" class="tab-content">
+        <div id="dexStatus" class="status">
+          Please visit a valid DexScreener token page
+        </div>
+        
+        <div id="dexTokenInfo" class="hidden">
+          <h3>Token Details</h3>
+          <div id="tokenAddress"></div>
+          <div id="pairAddress"></div>
+          <div id="chainType"></div>
+        </div>
+        
+        <button id="fetchTokenDetails" class="hidden">Fetch Token Details</button>
       </div>
 
       <!-- Settings Tab -->

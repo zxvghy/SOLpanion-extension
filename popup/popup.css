@@ -209,3 +209,19 @@ button:disabled {
 .full-width-button:hover {
   background: #0056b3;
 }
+
+.dex-info {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+}
+
+#dexTokenInfo div {
+  margin-bottom: 5px;
+}
+
+#fetchTokenDetails {
+  margin-top: 10px;
+  width: 100%;
+}
