@@ -12,6 +12,108 @@ const Popup = () => {
   const [result, setResult] = useState('');
   const [recentPrompts, setRecentPrompts] = useState([]);
 
+  // DEX State
+  const [dexStatus, setDexStatus] = useState('');
+  const [dexStatusType, setDexStatusType] = useState('error');
+  const [chainType, setChainType] = useState('');
+  const [pairAddress, setPairAddress] = useState('');
+  const [tokenInfo, setTokenInfo] = useState(null);
+  const [isDexTokenVisible, setIsDexTokenVisible] = useState(false);
+
+  // Utility function to validate DEX URL
+  const validateDexUrl = (url) => {
+    const dexScreenerRegex = /^https:\/\/dexscreener\.com\/(solana|ethereum)\/[a-zA-Z0-9]+$/;
+    const photonSolRegex = /^https:\/\/photon-sol\.tinyastro\.io\/en\/lp\/[a-zA-Z0-9]+(\?handle=[a-zA-Z0-9]+)?$/;
+    return dexScreenerRegex.test(url) || photonSolRegex.test(url);
+  };
+
+  // Function to extract DEX and chain details from URL
+  const extractDexDetails = (url) => {
+    const urlParts = url.split('/');
+    if (url.includes('dexscreener.com')) {
+      return {
+        chainType: urlParts[3],
+        pairAddress: urlParts[4]
+      };
+    } else {
+      const pairAddress = urlParts[5].split('?')[0];
+      return {
+        chainType: pairAddress.startsWith('0x') ? 'Ethereum' : 'Solana',
+        pairAddress: pairAddress
+      };
+    }
+  };
+
+  // Function to fetch token details
+  const fetchTokenDetails = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const { chainType, pairAddress } = extractDexDetails(tab.url);
+
+      const apiUrl = `https://api.dexscreener.io/latest/dex/pairs/${chainType.toLowerCase()}/${pairAddress}`;
+
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        setDexStatus(`Error fetching details for ${chainType} ${pairAddress}`);
+        setDexStatusType('error');
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (!data.pair || !data.pair.baseToken) {
+        setDexStatus('Unable to find token details');
+        setDexStatusType('error');
+        return;
+      }
+
+      const baseToken = data.pair.baseToken;
+      setTokenInfo({
+        name: baseToken.name,
+        symbol: baseToken.symbol,
+        address: baseToken.address
+      });
+      setChainType(chainType);
+      setPairAddress(pairAddress);
+      setIsDexTokenVisible(true);
+      setDexStatus('');
+    } catch (error) {
+      setDexStatus(`${error}`);
+      setDexStatusType('error');
+    }
+  };
+
+  // Check DEX page when DEX tab is selected
+  useEffect(() => {
+    const checkDexPage = async () => {
+      if (activeTab === 'dex') {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          
+          if (!tab.url || !validateDexUrl(tab.url)) {
+            setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
+            setDexStatusType('error');
+            setIsDexTokenVisible(false);
+            return;
+          }
+
+          const { chainType, pairAddress } = extractDexDetails(tab.url);
+
+          setChainType(chainType);
+          setPairAddress(pairAddress);
+          setDexStatus('');
+          setDexStatusType('success');
+        } catch (error) {
+          setDexStatus('Error checking current tab');
+          setDexStatusType('error');
+        }
+      }
+    };
+
+    checkDexPage();
+  }, [activeTab]);
+
   // Load API key on mount
   useEffect(() => {
     const loadApiKey = async () => {
@@ -142,7 +244,7 @@ const Popup = () => {
 
       {/* Tab Navigation */}
       <div className="flex border-b bg-white">
-        {['analyze', 'history', 'settings'].map((tab) => (
+        {['analyze', 'dex', 'history', 'settings'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -186,6 +288,54 @@ const Popup = () => {
               <div className="p-4 bg-white border border-gray-200 rounded-xl">
                 {result}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* DEX Tab */}
+        {activeTab === 'dex' && (
+          <div className="p-4 space-y-4">
+            {dexStatus && (
+              <div className={`p-3 rounded-xl text-center ${
+                dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
+                {dexStatus}
+              </div>
+            )}
+
+            {chainType && pairAddress && (
+              <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
+                <div>
+                  <strong>Chain:</strong> {chainType}
+                </div>
+                <div>
+                  <strong>Pair Address:</strong> {pairAddress}
+                </div>
+              </div>
+            )}
+
+            {isDexTokenVisible && tokenInfo && (
+              <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
+                <h3 className="font-semibold text-gray-900">Token Details</h3>
+                <div>
+                  <strong>Name:</strong> {tokenInfo.name}
+                </div>
+                <div>
+                  <strong>Symbol:</strong> {tokenInfo.symbol}
+                </div>
+                <div>
+                  <strong>Address:</strong> {tokenInfo.address}
+                </div>
+              </div>
+            )}
+
+            {chainType && pairAddress && !isDexTokenVisible && (
+              <button
+                onClick={fetchTokenDetails}
+                className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
+              >
+                Fetch Token Details
+              </button>
             )}
           </div>
         )}

@@ -190,7 +190,7 @@ optgroup,
 select,
 textarea {
   font-family: inherit; /* 1 */
-  font-feature-settings: inherit; /* 1 */
+  font-feature-: inherit; /* 1 */
   font-variation-settings: inherit; /* 1 */
   font-size: 100%; /* 1 */
   font-weight: inherit; /* 1 */
@@ -508,10 +508,17 @@ video {
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
 }
+.\\!container {
+  width: 100% !important;
+}
 .container {
   width: 100%;
 }
 @media (min-width: 640px) {
+
+  .\\!container {
+    max-width: 640px !important;
+  }
 
   .container {
     max-width: 640px;
@@ -519,11 +526,19 @@ video {
 }
 @media (min-width: 768px) {
 
+  .\\!container {
+    max-width: 768px !important;
+  }
+
   .container {
     max-width: 768px;
   }
 }
 @media (min-width: 1024px) {
+
+  .\\!container {
+    max-width: 1024px !important;
+  }
 
   .container {
     max-width: 1024px;
@@ -531,15 +546,38 @@ video {
 }
 @media (min-width: 1280px) {
 
+  .\\!container {
+    max-width: 1280px !important;
+  }
+
   .container {
     max-width: 1280px;
   }
 }
 @media (min-width: 1536px) {
 
+  .\\!container {
+    max-width: 1536px !important;
+  }
+
   .container {
     max-width: 1536px;
   }
+}
+.visible {
+  visibility: visible;
+}
+.invisible {
+  visibility: hidden;
+}
+.collapse {
+  visibility: collapse;
+}
+.static {
+  position: static;
+}
+.fixed {
+  position: fixed;
 }
 .absolute {
   position: absolute;
@@ -562,8 +600,17 @@ video {
 .block {
   display: block;
 }
+.inline {
+  display: inline;
+}
 .flex {
   display: flex;
+}
+.table {
+  display: table;
+}
+.grid {
+  display: grid;
 }
 .contents {
   display: contents;
@@ -586,14 +633,40 @@ video {
 .flex-1 {
   flex: 1 1 0%;
 }
+.flex-shrink {
+  flex-shrink: 1;
+}
+.shrink {
+  flex-shrink: 1;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.grow {
+  flex-grow: 1;
+}
+.border-collapse {
+  border-collapse: collapse;
+}
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .cursor-not-allowed {
   cursor: not-allowed;
 }
 .resize-none {
   resize: none;
 }
+.resize {
+  resize: both;
+}
 .gap-2 {
   gap: 0.5rem;
+}
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 .space-y-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
@@ -679,6 +752,15 @@ video {
 .font-semibold {
   font-weight: 600;
 }
+.uppercase {
+  text-transform: uppercase;
+}
+.lowercase {
+  text-transform: lowercase;
+}
+.capitalize {
+  text-transform: capitalize;
+}
 .text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
@@ -711,10 +793,41 @@ video {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
+.underline {
+  text-decoration-line: underline;
+}
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.outline {
+  outline-style: solid;
+}
+.blur {
+  --tw-blur: blur(8px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.backdrop-filter {
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+          backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
+.\\!transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 150ms !important;
+}
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
@@ -35999,6 +36112,110 @@ const Popup = () => {
   const [result, setResult] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [recentPrompts, setRecentPrompts] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
 
+  // DEX State
+  const [dexStatus, setDexStatus] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [dexStatusType, setDexStatusType] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('error');
+  const [chainType, setChainType] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [pairAddress, setPairAddress] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [tokenInfo, setTokenInfo] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [isDexTokenVisible, setIsDexTokenVisible] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+
+  // Utility function to validate DEX URL
+  const validateDexUrl = url => {
+    const dexScreenerRegex = /^https:\/\/dexscreener\.com\/(solana|ethereum)\/[a-zA-Z0-9]+$/;
+    const photonSolRegex = /^https:\/\/photon-sol\.tinyastro\.io\/en\/lp\/[a-zA-Z0-9]+(\?handle=[a-zA-Z0-9]+)?$/;
+    return dexScreenerRegex.test(url) || photonSolRegex.test(url);
+  };
+
+  // Function to extract DEX and chain details from URL
+  const extractDexDetails = url => {
+    const urlParts = url.split('/');
+    if (url.includes('dexscreener.com')) {
+      return {
+        chainType: urlParts[3],
+        pairAddress: urlParts[4]
+      };
+    } else {
+      const pairAddress = urlParts[5].split('?')[0];
+      return {
+        chainType: pairAddress.startsWith('0x') ? 'Ethereum' : 'Solana',
+        pairAddress: pairAddress
+      };
+    }
+  };
+
+  // Function to fetch token details
+  const fetchTokenDetails = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      });
+      const {
+        chainType,
+        pairAddress
+      } = extractDexDetails(tab.url);
+      const apiUrl = `https://api.dexscreener.io/latest/dex/pairs/${chainType.toLowerCase()}/${pairAddress}`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        setDexStatus(`Error fetching details for ${chainType} ${pairAddress}`);
+        setDexStatusType('error');
+        return;
+      }
+      const data = await response.json();
+      if (!data.pair || !data.pair.baseToken) {
+        setDexStatus('Unable to find token details');
+        setDexStatusType('error');
+        return;
+      }
+      const baseToken = data.pair.baseToken;
+      setTokenInfo({
+        name: baseToken.name,
+        symbol: baseToken.symbol,
+        address: baseToken.address
+      });
+      setChainType(chainType);
+      setPairAddress(pairAddress);
+      setIsDexTokenVisible(true);
+      setDexStatus('');
+    } catch (error) {
+      setDexStatus(`${error}`);
+      setDexStatusType('error');
+    }
+  };
+
+  // Check DEX page when DEX tab is selected
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const checkDexPage = async () => {
+      if (activeTab === 'dex') {
+        try {
+          const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          });
+          if (!tab.url || !validateDexUrl(tab.url)) {
+            setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
+            setDexStatusType('error');
+            setIsDexTokenVisible(false);
+            return;
+          }
+          const {
+            chainType,
+            pairAddress
+          } = extractDexDetails(tab.url);
+          setChainType(chainType);
+          setPairAddress(pairAddress);
+          setDexStatus('');
+          setDexStatusType('success');
+        } catch (error) {
+          setDexStatus('Error checking current tab');
+          setDexStatusType('error');
+        }
+      }
+    };
+    checkDexPage();
+  }, [activeTab]);
+
   // Load API key on mount
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     const loadApiKey = async () => {
@@ -36145,7 +36362,7 @@ const Popup = () => {
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
       className: "flex border-b bg-white",
-      children: ['analyze', 'history', 'settings'].map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+      children: ['analyze', 'dex', 'history', 'settings'].map(tab => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
         onClick: () => setActiveTab(tab),
         className: `flex-1 py-3 px-4 text-sm font-medium transition-colors
               ${activeTab === tab ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700'}`,
@@ -36175,6 +36392,45 @@ const Popup = () => {
         }), result && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "p-4 bg-white border border-gray-200 rounded-xl",
           children: result
+        })]
+      }), activeTab === 'dex' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+        className: "p-4 space-y-4",
+        children: [dexStatus && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: `p-3 rounded-xl text-center ${dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`,
+          children: dexStatus
+        }), chainType && pairAddress && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+          className: "bg-white border border-gray-200 rounded-xl p-4 space-y-2",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("strong", {
+              children: "Chain:"
+            }), " ", chainType]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("strong", {
+              children: "Pair Address:"
+            }), " ", pairAddress]
+          })]
+        }), isDexTokenVisible && tokenInfo && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+          className: "bg-white border border-gray-200 rounded-xl p-4 space-y-2",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h3", {
+            className: "font-semibold text-gray-900",
+            children: "Token Details"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("strong", {
+              children: "Name:"
+            }), " ", tokenInfo.name]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("strong", {
+              children: "Symbol:"
+            }), " ", tokenInfo.symbol]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("strong", {
+              children: "Address:"
+            }), " ", tokenInfo.address]
+          })]
+        }), chainType && pairAddress && !isDexTokenVisible && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+          onClick: fetchTokenDetails,
+          className: "w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors",
+          children: "Fetch Token Details"
         })]
       }), activeTab === 'history' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
         className: "space-y-4",
