@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dotenv": "^16.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -21,12 +22,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "background.js",
-
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "watch": "webpack --config webpack.config.js --watch"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC"

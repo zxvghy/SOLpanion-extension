@@ -1,4 +1,6 @@
 const path = require('path');
+const webpack = require('webpack');
+require('dotenv').config(); // <-- Make sure this is present
 
 module.exports = {
   mode: 'development',
@@ -13,20 +15,13 @@ module.exports = {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'popup'),
     environment: {
-      // The environment supports arrow functions ('() => { ... }').
       arrowFunction: true,
-      // The environment supports BigInt as literal (123n).
       bigIntLiteral: false,
-      // The environment supports const and let for variable declarations.
       const: true,
-      // The environment supports destructuring ('{ a, b } = obj').
       destructuring: true,
-      // The environment supports an async import() function to import EcmaScript modules.
       dynamicImport: false,
-      // The environment supports 'for of' iteration ('for (const x of array) { ... }').
       forOf: true,
-      // The environment supports ECMAScript Module syntax to import ECMAScript modules (import ... from '...').
-      module: false,
+      module: false
     }
   },
   module: {
@@ -75,5 +70,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.jsx']
-  }
+  },
+  plugins: [
+    // Inject the environment variable at build time:
+    new webpack.DefinePlugin({
+      'process.env.DEEPSEEK_API_KEY': JSON.stringify(process.env.DEEPSEEK_API_KEY || '')
+    })
+  ]
 };

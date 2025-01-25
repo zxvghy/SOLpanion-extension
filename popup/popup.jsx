@@ -53,7 +53,7 @@ const Popup = () => {
       const apiUrl = `https://api.dexscreener.io/latest/dex/pairs/${chainType.toLowerCase()}/${pairAddress}`;
 
       const response = await fetch(apiUrl);
-      
+
       if (!response.ok) {
         setDexStatus(`Error fetching details for ${chainType} ${pairAddress}`);
         setDexStatusType('error');
@@ -61,7 +61,7 @@ const Popup = () => {
       }
 
       const data = await response.json();
-      
+
       if (!data.pair || !data.pair.baseToken) {
         setDexStatus('Unable to find token details');
         setDexStatusType('error');
@@ -89,7 +89,7 @@ const Popup = () => {
     const checkDexPage = async () => {
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        
+
         if (!tab.url || !validateDexUrl(tab.url)) {
           setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
           setDexStatusType('error');
@@ -170,18 +170,24 @@ const Popup = () => {
 
       const truncatedContent = pageContent.slice(0, 4000); // Use config.MAX_CONTEXT_LENGTH in your actual code
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const dsapiKey = process.env.DEEPSEEK_API_KEY;
+      if (!dsapiKey) {
+        throw new Error('DeepSeek API key is missing. Make sure .env is set and webpack is configured.');
+      }
+
+      // Now call DeepSeek (or OpenAI) with the env-based key
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${dsapiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo', // Use config.MODEL in your actual code
+          model: 'deepseek-chat',
           messages: [
             {
               role: 'system',
-              content: 'You are a helpful assistant that analyzes webpage content. Be concise and specific in your responses.'
+              content: 'You are a helpful assistant that analyzes webpage content.'
             },
             {
               role: 'user',
@@ -191,6 +197,7 @@ const Popup = () => {
           max_tokens: 500
         })
       });
+
 
       const data = await response.json();
       if (data.error) {
@@ -210,7 +217,7 @@ const Popup = () => {
 
         await chrome.storage.sync.set({ promptHistory: newHistory });
         setResult(aiResponse);
-        
+
         if (activeTab === 'history') {
           await loadRecentPrompts();
         }
@@ -250,8 +257,8 @@ const Popup = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-3 px-4 text-sm font-medium transition-colors
-              ${activeTab === tab 
-                ? 'text-purple-600 border-b-2 border-purple-600' 
+              ${activeTab === tab
+                ? 'text-purple-600 border-b-2 border-purple-600'
                 : 'text-gray-500 hover:text-gray-700'}`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -297,9 +304,8 @@ const Popup = () => {
         {activeTab === 'dex' && (
           <div className="p-4 space-y-4">
             {dexStatus && (
-              <div className={`p-3 rounded-xl text-center ${
-                dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-              }`}>
+              <div className={`p-3 rounded-xl text-center ${dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
                 {dexStatus}
               </div>
             )}
@@ -351,8 +357,8 @@ const Popup = () => {
             )}
             <button
               onClick={() => {
-                chrome.tabs.create({ 
-                  url: chrome.runtime.getURL('dashboard/dashboard.html') 
+                chrome.tabs.create({
+                  url: chrome.runtime.getURL('dashboard/dashboard.html')
                 });
               }}
               className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
@@ -391,9 +397,8 @@ const Popup = () => {
               Save API Key
             </button>
             {status.message && (
-              <div className={`p-3 rounded-xl text-center ${
-                status.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-              }`}>
+              <div className={`p-3 rounded-xl text-center ${status.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
                 {status.message}
               </div>
             )}

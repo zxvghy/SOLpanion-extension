@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Remove active class from all buttons and contents
       tabButtons.forEach(btn => btn.classList.remove('active'));
       tabContents.forEach(content => content.classList.remove('active'));
-      
+
       // Add active class to clicked button and corresponding content
       button.classList.add('active');
       document.getElementById(`${button.dataset.tab}Tab`).classList.add('active');
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Save API key
   saveKeyBtn.addEventListener('click', async () => {
     const apiKey = apiKeyInput.value.trim();
-    
+
     if (!apiKey) {
       showStatus('Please enter an API key', 'error');
       return;
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadRecentPrompts() {
     try {
       const { promptHistory = [] } = await chrome.storage.sync.get('promptHistory');
-      
+
       recentPrompts.innerHTML = promptHistory
         .slice(0, 3) // Show only last 3 prompts
         .map(item => `
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const { apiKey } = await chrome.storage.sync.get('apiKey');
-      
+
       if (!apiKey) {
         throw new Error('Please set your OpenAI API key in the Settings tab');
       }
@@ -138,14 +138,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const truncatedContent = pageContent.slice(0, config.MAX_CONTEXT_LENGTH);
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: config.MODEL,
+          model: 'deepseek-chat',
           messages: [
             {
               role: 'system',

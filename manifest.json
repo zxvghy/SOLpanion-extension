@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Analyze pages using OpenAI",
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["https://api.openai.com/*"],
+  "host_permissions": ["https://api.deepseek.com/*"],
   "action": {
     "default_popup": "popup/popup.html"
   },

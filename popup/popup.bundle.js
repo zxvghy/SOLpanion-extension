@@ -36277,18 +36277,23 @@ const Popup = () => {
       });
       const truncatedContent = pageContent.slice(0, 4000); // Use config.MAX_CONTEXT_LENGTH in your actual code
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const dsapiKey = "sk-7d0c29478bff4dd489b25b74f6c21d0a";
+      if (!dsapiKey) {
+        throw new Error('DeepSeek API key is missing. Make sure .env is set and webpack is configured.');
+      }
+
+      // Now call DeepSeek (or OpenAI) with the env-based key
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${dsapiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          // Use config.MODEL in your actual code
+          model: 'deepseek-chat',
           messages: [{
             role: 'system',
-            content: 'You are a helpful assistant that analyzes webpage content. Be concise and specific in your responses.'
+            content: 'You are a helpful assistant that analyzes webpage content.'
           }, {
             role: 'user',
             content: `Page Content: ${truncatedContent}\n\nPrompt: ${prompt}`
