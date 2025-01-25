@@ -207,4 +207,111 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.querySelector('[data-tab="history"]').classList.contains('active')) {
     await loadRecentPrompts();
   }
+
+  // DEX Tab Functionality
+  const dexStatusDiv = document.getElementById('dexStatus');
+  const dexTokenInfoDiv = document.getElementById('dexTokenInfo');
+  const tokenAddressDiv = document.getElementById('tokenAddress');
+  const pairAddressDiv = document.getElementById('pairAddress');
+  const chainTypeDiv = document.getElementById('chainType');
+  const fetchTokenDetailsBtn = document.getElementById('fetchTokenDetails');
+
+  // DEX Screener and Photon Sol URL validation function
+  function validateDexUrl(url) {
+    const dexScreenerRegex = /^https:\/\/dexscreener\.com\/(solana|ethereum)\/[a-zA-Z0-9]+$/;
+    const photonSolRegex = /^https:\/\/photon-sol\.tinyastro\.io\/en\/lp\/[a-zA-Z0-9]+(\?handle=[a-zA-Z0-9]+)?$/;
+    return dexScreenerRegex.test(url) || photonSolRegex.test(url);
+  }
+
+  // Function to extract DEX and chain details from URL
+  function extractDexDetails(url) {
+    const urlParts = url.split('/');
+    if (url.includes('dexscreener.com')) {
+      return {
+        chainType: urlParts[3],
+        pairAddress: urlParts[4]
+      };
+    } else {
+      const pairAddress = urlParts[5].split('?')[0];
+      return {
+        chainType: pairAddress.startsWith('0x') ? 'Ethereum' : 'Solana',
+        pairAddress: pairAddress
+      };
+    }
+  }
+
+  // Function to update DEX tab status
+  function updateDexStatus(message, isError = true) {
+    dexStatusDiv.textContent = message;
+    dexStatusDiv.className = `status ${isError ? 'error' : 'success'}`;
+    dexTokenInfoDiv.classList.add('hidden');
+    fetchTokenDetailsBtn.classList.add('hidden');
+  }
+
+  // Tab buttons event listener for DEX tab
+  tabButtons.forEach(button => {
+    button.addEventListener('click', async () => {
+      if (button.dataset.tab === 'dex') {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          
+          if (!tab.url || !validateDexUrl(tab.url)) {
+            updateDexStatus('Please visit a valid DexScreener or Photon Sol token page');
+            return;
+          }
+
+          const { chainType, pairAddress } = extractDexDetails(tab.url);
+
+          dexStatusDiv.classList.add('hidden');
+          dexTokenInfoDiv.classList.remove('hidden');
+          fetchTokenDetailsBtn.classList.remove('hidden');
+
+          chainTypeDiv.textContent = `Chain: ${chainType}`;
+          pairAddressDiv.textContent = `Pair Address: ${pairAddress}`;
+        } catch (error) {
+          updateDexStatus('Error checking current tab');
+        }
+      }
+    });
+  });
+
+  // Fetch Token Details Button
+  fetchTokenDetailsBtn.addEventListener('click', async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const { chainType, pairAddress } = extractDexDetails(tab.url);
+
+      const apiUrl = `https://api.dexscreener.io/latest/dex/pairs/${chainType.toLowerCase()}/${pairAddress}`;
+
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        updateDexStatus(`${chainType} ${pairAddress}`);
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (!data.pair || !data.pair.baseToken) {
+        updateDexStatus('Unable to find token details');
+        return;
+      }
+
+      const baseTokenAddress = data.pair.baseToken.address;
+      const baseTokenName = data.pair.baseToken.name;
+      const baseTokenSymbol = data.pair.baseToken.symbol;
+
+      tokenAddressDiv.innerHTML = `
+        <strong>Base Token:</strong>
+        <div>Name: ${baseTokenName}</div>
+        <div>Symbol: ${baseTokenSymbol}</div>
+        <div>Address: ${baseTokenAddress}</div>
+      `;
+
+      dexStatusDiv.classList.add('hidden');
+      fetchTokenDetailsBtn.classList.add('hidden');
+    } catch (error) {
+      updateDexStatus(`${error}`);
+    }
+  });
 });

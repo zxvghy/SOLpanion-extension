@@ -13,7 +13,87 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script src="popup.bundle.js"></script>
+    <header class="header">
+      <h2>AI Page Assistant</h2>
+    </header>
+    
+    <div class="tab-navigation">
+      <button class="tab-button active" data-tab="analyze">Analyze</button>
+      <button class="tab-button" data-tab="dex">DEX / Photon</button>  <!-- New DEX tab -->
+      <button class="tab-button" data-tab="settings">Settings</button>
+      <button class="tab-button" data-tab="history">History</button>  <!-- New tab button -->
+      
+    </div>
+
+    <div class="container">
+      <!-- Analyze Tab -->
+      <div id="analyzeTab" class="tab-content active">
+        <div class="input-group">
+          <textarea 
+            id="promptInput" 
+            placeholder="Enter your prompt (max 200 characters)"
+            maxlength="200"
+          ></textarea>
+          <div class="char-count">
+            <span id="charCount">0</span>/200
+          </div>
+        </div>
+        
+        <button id="analyzeButton">Analyze with AI</button>
+
+        <div id="loadingIndicator" class="loading hidden">
+          Processing...
+        </div>
+        
+        <div id="result" class="result hidden"></div>
+      </div>
+
+      <div id="dexTab" class="tab-content">
+        <div id="dexStatus" class="status">
+          Please visit a valid DexScreener token page
+        </div>
+        
+        <div id="dexTokenInfo" class="hidden">
+          <h3>Token Details</h3>
+          <div id="tokenAddress"></div>
+          <div id="pairAddress"></div>
+          <div id="chainType"></div>
+        </div>
+        
+        <button id="fetchTokenDetails" class="hidden">Fetch Token Details</button>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settingsTab" class="tab-content">
+        <div class="settings-group">
+          <label for="apiKey">OpenAI API Key:</label>
+          <div class="api-key-input">
+            <input 
+              type="password" 
+              id="apiKey" 
+              placeholder="Enter your OpenAI API Key"
+            >
+            <button id="toggleVisibility" class="icon-button">
+              Show
+            </button>
+          </div>
+          <button id="saveKey">Save API Key</button>
+        </div>
+        <div id="status" class="status hidden"></div>
+      </div>
+
+      <div id="historyTab" class="tab-content">
+        <div class="history-preview">
+          <h3>Recent Prompts</h3>
+          <div id="recentPrompts" class="recent-prompts"></div>
+          <button id="openDashboard" class="full-width-button">
+            View Full History
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="popup.js"></script>
   </body>
 </html>
