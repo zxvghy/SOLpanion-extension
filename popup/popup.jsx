@@ -358,7 +358,8 @@ const Popup = () => {
             <button
               onClick={() => {
                 chrome.tabs.create({
-                  url: chrome.runtime.getURL('dashboard/dashboard.html')
+                  url: chrome.runtime.getURL('dashboard/dashboard.html'),
+                  active: false  // This will open the dashboard in a new background tab
                 });
               }}
               className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
