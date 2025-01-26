@@ -24,6 +24,19 @@ const Popup = () => {
   const [isDexAnalyzing, setIsDexAnalyzing] = useState(false);
   const [pairDetails, setPairDetails] = useState(null);
 
+  const markdownComponents = {
+    h1: ({ ...props }) => <h1 className="text-lg font-bold text-gray-900" {...props} />,
+    h2: ({ ...props }) => <h2 className="text-base font-semibold text-gray-900" {...props} />,
+    p: ({ ...props }) => <p className="text-gray-600 leading-relaxed" {...props} />,
+    ul: ({ ...props }) => <ul className="list-disc pl-5" {...props} />,
+    li: ({ ...props }) => (
+      <li className="text-gray-600 break-words">
+        <span className="whitespace-pre-wrap block leading-tight py-0.5">
+          {props.children}
+        </span>
+      </li>
+    ),
+  };
 
   // Utility function to validate DEX URL
   const validateDexUrl = (url) => {
@@ -56,38 +69,38 @@ const Popup = () => {
       console.log('Tab URL:', tab.url);
       const { chainType, pairAddress } = extractDexDetails(tab.url);
       console.log('Extracted details:', { chainType, pairAddress });
-  
+
       const apiUrl = `https://api.dexscreener.io/latest/dex/pairs/${chainType.toLowerCase()}/${pairAddress}`;
       console.log('API URL:', apiUrl);
-  
+
       const response = await fetch(apiUrl);
       console.log('Response status:', response.status);
-  
+
       if (!response.ok) {
         setDexStatus(`Error fetching details for ${chainType} ${pairAddress}`);
         setDexStatusType('error');
         return;
       }
-  
+
       const data = await response.json();
       console.log('API Response data:', data);
-  
+
       if (!data.pair || !data.pair.baseToken) {
         setDexStatus('Unable to find token details');
         setDexStatusType('error');
         return;
       }
-      
+
       setPairDetails(data.pair);
       const baseToken = data.pair.baseToken;
       console.log('Base token:', baseToken);
-  
+
       const tokenInfoData = {
         name: baseToken.name,
         symbol: baseToken.symbol,
         address: baseToken.address
       };
-  
+
       setTokenInfo(tokenInfoData);
       setChainType(chainType);
       setPairAddress(pairAddress);
@@ -114,27 +127,27 @@ const Popup = () => {
         setTokenInfo(null);
         return;
       }
-      
+
       console.log('Checking DEX page on tab change');
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         console.log('Current tab:', tab);
-  
+
         if (!tab.url || !validateDexUrl(tab.url)) {
           setDexStatus('Please visit a valid DexScreener or Photon Sol token page');
           setDexStatusType('error');
           setIsDexTokenVisible(false);
           return;
         }
-  
+
         const { chainType, pairAddress } = extractDexDetails(tab.url);
         console.log('Extracted details:', { chainType, pairAddress }); // Debug log
-  
+
         setChainType(chainType);
         setPairAddress(pairAddress);
         setDexStatus('');
         setDexStatusType('success');
-  
+
         // Fetch token details
         await fetchTokenDetails();
       } catch (error) {
@@ -142,22 +155,22 @@ const Popup = () => {
         setDexStatusType('error');
       }
     };
-  
+
     checkDexPage();
   }, [activeTab]);
 
-// Modified analyze function with complete data
-const analyzeDexToken = async () => {
-  if (!tokenInfo || !pairDetails) return;
-  
-  setIsDexAnalyzing(true);
-  setDexAnalysis('');
+  // Modified analyze function with complete data
+  const analyzeDexToken = async () => {
+    if (!tokenInfo || !pairDetails) return;
 
-  try {
-    const formatNumber = (num) => 
-      num ? `$${Number(num).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
+    setIsDexAnalyzing(true);
+    setDexAnalysis('');
 
-    const tokenDataString = `
+    try {
+      const formatNumber = (num) =>
+        num ? `$${Number(num).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
+
+      const tokenDataString = `
         Token Address: \`${pairDetails.baseToken.address}\`
         Chain: ${chainType}
         Pair Address: \`${pairDetails.pairAddress}\`
@@ -177,36 +190,36 @@ const analyzeDexToken = async () => {
           ${pairDetails.baseToken.verified ? '✓ Verified' : '⚠ Unverified'}
           Social Links: ${pairDetails.info?.socials?.join(', ') || 'None'}`;
 
-    const messages = [
-      {
-        role: "system",
-        content: `You're a crypto analyst. Analyze this token using EXACTLY this format. Be concise. Highlight risks. Current UTC: ${new Date().toISOString()}`
-      },
-      {
-        role: "user",
-        content: `Analyze this token using these metrics:\n${tokenDataString}`
-      }
-    ];
+      const messages = [
+        {
+          role: "system",
+          content: `You're a crypto analyst. Analyze this token using EXACTLY this format. Be concise. Highlight risks. Current UTC: ${new Date().toISOString()}`
+        },
+        {
+          role: "user",
+          content: `Analyze this token using these metrics:\n${tokenDataString}`
+        }
+      ];
 
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages,
-        temperature: 0.3,
-        max_tokens: 700
-      })
-    });
-  
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages,
+          temperature: 0.3,
+          max_tokens: 700
+        })
+      });
+
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error.message);
       }
-  
+
       const analysis = data.choices[0].message.content.trim();
       setDexAnalysis(analysis);
 
@@ -218,13 +231,13 @@ const analyzeDexToken = async () => {
         url: tab.url,
         timestamp: Date.now()
       }, ...promptHistory].slice(0, 100);
-  
+
       await chrome.storage.sync.set({ promptHistory: newHistory });
-      
+
       if (activeTab === 'history') {
         await loadRecentPrompts();
       }
-  
+
     } catch (error) {
       setDexAnalysis(`Error analyzing token: ${error.message}`);
     } finally {
@@ -259,11 +272,11 @@ const analyzeDexToken = async () => {
 
   const handleAnalyze = async () => {
     if (!prompt.trim()) return;
-  
+
     try {
       setLoading(true);
       setResult('');
-  
+
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
       await chrome.scripting.executeScript({
@@ -373,18 +386,18 @@ const analyzeDexToken = async () => {
 
       {/* Tab Navigation */}
       <div className="flex border-b bg-white">
-      {['analyze', 'dex', 'history'].map((tab) => ( // Removed 'settings'
-        <button
-          key={tab}
-          onClick={() => setActiveTab(tab)}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors
+        {['analyze', 'dex', 'history'].map((tab) => ( // Removed 'settings'
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 py-3 px-4 text-sm font-medium transition-colors
             ${activeTab === tab
-              ? 'text-purple-600 border-b-2 border-purple-600'
-              : 'text-gray-500 hover:text-gray-700'}`}
-        >
-          {tab.charAt(0).toUpperCase() + tab.slice(1)}
-        </button>
-      ))}
+                ? 'text-purple-600 border-b-2 border-purple-600'
+                : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Content */}
@@ -415,176 +428,156 @@ const analyzeDexToken = async () => {
             </button>
             {result && (
               <div className="p-4 bg-white border border-gray-200 rounded-xl">
-                {result}
+                <div className="overflow-x-auto markdown-content2">
+                  <ReactMarkdown className="space-y-4" components={markdownComponents}>
+                    {result}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
           </div>
         )}
 
-    {/* DEX Tab */}
-    {activeTab === 'dex' && (
-      <div className="p-4 space-y-4">
-        {console.log('Rendering DEX tab with:', {
-          isDexTokenVisible,
-          tokenInfo,
-          chainType,
-          pairAddress
-        })}
+        {/* DEX Tab */}
+        {activeTab === 'dex' && (
+          <div className="p-4 space-y-4">
+            {console.log('Rendering DEX tab with:', {
+              isDexTokenVisible,
+              tokenInfo,
+              chainType,
+              pairAddress
+            })}
 
-        {dexStatus && (
-          <div className={`p-3 rounded-xl text-center ${
-            dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-          }`}>
-            {dexStatus}
-          </div>
-        )}
+            {dexStatus && (
+              <div className={`p-3 rounded-xl text-center ${dexStatusType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                {dexStatus}
+              </div>
+            )}
 
-        {chainType && pairAddress && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
-            <div>
-              <strong>Chain:</strong> {chainType}
-            </div>
-            <div>
-              <strong>Pair Address:</strong> {' '}
-              <span className="font-mono break-words whitespace-pre-wrap">
-              {pairAddress}
-              </span>
-            </div>
-          </div>
-        )}
+            {chainType && pairAddress && (
+              <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
+                <div>
+                  <strong>Chain:</strong> {chainType}
+                </div>
+                <div>
+                  <strong>Pair Address:</strong> {' '}
+                  <span className="font-mono break-words whitespace-pre-wrap">
+                    {pairAddress}
+                  </span>
+                </div>
+              </div>
+            )}
 
-{tokenInfo && (
-  <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
-    <h3 className="font-semibold text-gray-900">Token Details</h3>
-    <div>
-      <strong>Name:</strong> {tokenInfo.name}
-    </div>
-    <div>
-      <strong>Symbol:</strong> {tokenInfo.symbol}
-    </div>
-    <div className="overflow-x-auto">
-      <strong>Address:</strong>{' '}
-      <span className="font-mono break-words whitespace-pre-wrap">
-        {tokenInfo.address}
-      </span>
-    </div>
-  </div>
-)}
+            {tokenInfo && (
+              <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
+                <h3 className="font-semibold text-gray-900">Token Details</h3>
+                <div>
+                  <strong>Name:</strong> {tokenInfo.name}
+                </div>
+                <div>
+                  <strong>Symbol:</strong> {tokenInfo.symbol}
+                </div>
+                <div className="overflow-x-auto">
+                  <strong>Address:</strong>{' '}
+                  <span className="font-mono break-words whitespace-pre-wrap">
+                    {tokenInfo.address}
+                  </span>
+                </div>
+              </div>
+            )}
 
-        {/* Show button separately */}
-        {tokenInfo && (
-          <button
-            onClick={analyzeDexToken}
-            disabled={isDexAnalyzing}
-            className={`w-full py-3 px-4 rounded-xl font-medium transition-colors
+            {/* Show button separately */}
+            {tokenInfo && (
+              <button
+                onClick={analyzeDexToken}
+                disabled={isDexAnalyzing}
+                className={`w-full py-3 px-4 rounded-xl font-medium transition-colors
               ${!isDexAnalyzing
-                ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
-          >
-            {isDexAnalyzing ? 'Analyzing...' : 'Analyze Token'}
-          </button>
-        )}
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+              >
+                {isDexAnalyzing ? 'Analyzing...' : 'Analyze Token'}
+              </button>
+            )}
 
-        {/* Show analysis if available */}
-        {dexAnalysis && (
-  <div className="p-4 bg-white border border-gray-200 rounded-xl">
-    <h3 className="font-semibold text-gray-900 mb-4">Analysis</h3>
-    <div className="overflow-x-auto">
-      <ReactMarkdown
-        className="space-y-4"
-        components={{
-          h1: ({node, ...props}) => (
-            <h1 className="text-lg font-bold text-gray-900" {...props} />
-          ),
-          h2: ({node, ...props}) => (
-            <h2 className="text-base font-semibold text-gray-900" {...props} />
-          ),
-          p: ({node, ...props}) => (
-            <p className="text-gray-600 leading-relaxed" {...props} />
-          ),
-          ul: ({node, ...props}) => (
-            <ul className="list-disc pl-5 space-y-1" {...props} />
-          ),
-          li: ({node, ...props}) => (
-            <li className="text-gray-600 break-words -my-0.5">
-              <span className="whitespace-pre-wrap block leading-tight py-0.5">
-                {props.children}
-              </span>
-            </li>
-          ),
-        }}
-      >
-        {dexAnalysis}
-      </ReactMarkdown>
-    </div>
-    <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500 italic">
-      Always conduct your own research before making investment decisions.
-    </div>
-  </div>
-)}
-      </div>
-    )}
-{/* History Tab */}
-{activeTab === 'history' && (
-  <div className="space-y-4">
-    {recentPrompts.length > 0 ? (
-      recentPrompts.map((item, index) => (
-        <div key={index} className="p-4 bg-white border border-gray-200 rounded-xl">
-          <p className="text-gray-700 font-medium mb-2">{item.prompt}</p>
-          <div className="markdown-content">
-            <ReactMarkdown
-              components={{
-                h1: ({node, ...props}) => (
-                  <h1 className="text-lg font-bold text-gray-900 mb-2" {...props} />
-                ),
-                h2: ({node, ...props}) => (
-                  <h2 className="text-base font-semibold text-gray-900 mb-2" {...props} />
-                ),
-                p: ({node, ...props}) => (
-                  <p className="text-gray-600 mb-2" {...props} />
-                ),
-                ul: ({node, ...props}) => (
-                  <ul className="list-disc pl-5 space-y-1" {...props} />
-                ),
-                li: ({node, ...props}) => (
-                  <li className="text-gray-600 break-words -my-0.5">
-                    <span className="whitespace-pre-wrap block leading-tight py-0.5">
-                      {props.children}
-                    </span>
-                  </li>
-                ),
-                code: ({node, inline, ...props}) => (
-                  <code 
-                    className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words" 
-                    {...props} 
-                  />
-                ),
-              }}
-            >
-              {item.response}
-            </ReactMarkdown>
+            {/* Show analysis if available */}
+            {dexAnalysis && (
+              <div className="p-4 bg-white border border-gray-200 rounded-xl">
+                <h3 className="font-semibold text-gray-900 mb-4">Analysis</h3>
+                <div className="overflow-x-auto markdown-content">
+                  <ReactMarkdown className="space-y-4" components={markdownComponents}>
+                    {dexAnalysis}
+                  </ReactMarkdown>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500 italic">
+                  Always conduct your own research before making investment decisions.
+                </div>
+              </div>
+            )}
           </div>
-          <p className="text-sm text-gray-500 mt-2">
-            {new Date(item.timestamp).toLocaleDateString()}
-          </p>
-        </div>
-      ))
-    ) : (
-      <p className="text-center text-gray-500 py-8">No recent prompts</p>
-    )}
-    <button
-      onClick={() => {
-        chrome.tabs.create({
-          url: chrome.runtime.getURL('dashboard/dashboard.html'),
-          active: false
-        });
-      }}
-      className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
-    >
-      View Full History
-    </button>
-  </div>
-)}
+        )}
+        {/* History Tab */}
+        {activeTab === 'history' && (
+          <div className="space-y-4">
+            {recentPrompts.length > 0 ? (
+              recentPrompts.map((item, index) => (
+                <div key={index} className="p-4 bg-white border border-gray-200 rounded-xl">
+                  <p className="text-gray-700 font-medium mb-2">{item.prompt}</p>
+                  <div className="markdown-content">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({ node, ...props }) => (
+                          <h1 className="text-lg font-bold text-gray-900 mb-2" {...props} />
+                        ),
+                        h2: ({ node, ...props }) => (
+                          <h2 className="text-base font-semibold text-gray-900 mb-2" {...props} />
+                        ),
+                        p: ({ node, ...props }) => (
+                          <p className="text-gray-600 mb-2" {...props} />
+                        ),
+                        ul: ({ node, ...props }) => (
+                          <ul className="list-disc pl-5 space-y-1" {...props} />
+                        ),
+                        li: ({ node, ...props }) => (
+                          <li className="text-gray-600 break-words -my-0.5">
+                            <span className="whitespace-pre-wrap block leading-tight py-0.5">
+                              {props.children}
+                            </span>
+                          </li>
+                        ),
+                        code: ({ node, inline, ...props }) => (
+                          <code
+                            className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words"
+                            {...props}
+                          />
+                        ),
+                      }}
+                    >
+                      {item.response}
+                    </ReactMarkdown>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {new Date(item.timestamp).toLocaleDateString()}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500 py-8">No recent prompts</p>
+            )}
+            <button
+              onClick={() => {
+                chrome.tabs.create({
+                  url: chrome.runtime.getURL('dashboard/dashboard.html'),
+                  active: false
+                });
+              }}
+              className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
+            >
+              View Full History
+            </button>
+          </div>
+        )}
 
         {/* Settings Tab 
         {activeTab === 'settings' && (

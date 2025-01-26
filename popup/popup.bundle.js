@@ -732,6 +732,9 @@ video {
 .list-none {
   list-style-type: none;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
 .items-start {
   align-items: flex-start;
 }
@@ -1053,6 +1056,26 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+
+.markdown-content ul ul {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  margin-left: 1.5rem;
+  /* <-- Add indent for sublist */
+  margin-bottom: 0 !important;
+  /* remove bottom spacing on the sublist */
+}
+
+/* Also remove top spacing on the next sibling <li> after a sublist */
+.markdown-content ul ul+li {
+  margin-top: 0 !important;
+}
 .hover\\:bg-purple-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(126 34 206 / var(--tw-bg-opacity));
@@ -1072,7 +1095,8 @@ video {
 .focus\\:ring-purple-500:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(168 85 247 / var(--tw-ring-opacity));
-}`, ""]);
+}
+`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -62162,19 +62186,16 @@ const _excluded = ["node"],
   _excluded3 = ["node"],
   _excluded4 = ["node"],
   _excluded5 = ["node"],
-  _excluded6 = ["node"],
-  _excluded7 = ["node"],
-  _excluded8 = ["node"],
-  _excluded9 = ["node"],
-  _excluded10 = ["node"],
-  _excluded11 = ["node", "inline"];
+  _excluded6 = ["node", "inline"];
+function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], -1 === t.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
+function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (-1 !== e.indexOf(n)) continue; t[n] = r[n]; } return t; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], -1 === t.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
-function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (-1 !== e.indexOf(n)) continue; t[n] = r[n]; } return t; }
+function _objectDestructuringEmpty(t) { if (null == t) throw new TypeError("Cannot destructure " + t); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 
 
 
@@ -62203,6 +62224,42 @@ const Popup = () => {
   const [dexAnalysis, setDexAnalysis] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [isDexAnalyzing, setIsDexAnalyzing] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [pairDetails, setPairDetails] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const markdownComponents = {
+    h1: _ref => {
+      let props = _extends({}, (_objectDestructuringEmpty(_ref), _ref));
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
+        className: "text-lg font-bold text-gray-900"
+      }, props));
+    },
+    h2: _ref2 => {
+      let props = _extends({}, (_objectDestructuringEmpty(_ref2), _ref2));
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
+        className: "text-base font-semibold text-gray-900"
+      }, props));
+    },
+    p: _ref3 => {
+      let props = _extends({}, (_objectDestructuringEmpty(_ref3), _ref3));
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
+        className: "text-gray-600 leading-relaxed"
+      }, props));
+    },
+    ul: _ref4 => {
+      let props = _extends({}, (_objectDestructuringEmpty(_ref4), _ref4));
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
+        className: "list-disc pl-5"
+      }, props));
+    },
+    li: _ref5 => {
+      let props = _extends({}, (_objectDestructuringEmpty(_ref5), _ref5));
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+        className: "text-gray-600 break-words",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+          className: "whitespace-pre-wrap block leading-tight py-0.5",
+          children: props.children
+        })
+      });
+    }
+  };
 
   // Utility function to validate DEX URL
   const validateDexUrl = url => {
@@ -62600,7 +62657,14 @@ const Popup = () => {
           children: loading ? 'Analyzing...' : 'Analyze'
         }), result && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "p-4 bg-white border border-gray-200 rounded-xl",
-          children: result
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "overflow-x-auto markdown-content2",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_markdown__WEBPACK_IMPORTED_MODULE_4__.Markdown, {
+              className: "space-y-4",
+              components: markdownComponents,
+              children: result
+            })
+          })
         })]
       }), activeTab === 'dex' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
         className: "p-4 space-y-4",
@@ -62660,60 +62724,10 @@ const Popup = () => {
             className: "font-semibold text-gray-900 mb-4",
             children: "Analysis"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-            className: "overflow-x-auto",
+            className: "overflow-x-auto markdown-content",
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_markdown__WEBPACK_IMPORTED_MODULE_4__.Markdown, {
               className: "space-y-4",
-              components: {
-                h1: _ref => {
-                  let {
-                      node
-                    } = _ref,
-                    props = _objectWithoutProperties(_ref, _excluded);
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
-                    className: "text-lg font-bold text-gray-900"
-                  }, props));
-                },
-                h2: _ref2 => {
-                  let {
-                      node
-                    } = _ref2,
-                    props = _objectWithoutProperties(_ref2, _excluded2);
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
-                    className: "text-base font-semibold text-gray-900"
-                  }, props));
-                },
-                p: _ref3 => {
-                  let {
-                      node
-                    } = _ref3,
-                    props = _objectWithoutProperties(_ref3, _excluded3);
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
-                    className: "text-gray-600 leading-relaxed"
-                  }, props));
-                },
-                ul: _ref4 => {
-                  let {
-                      node
-                    } = _ref4,
-                    props = _objectWithoutProperties(_ref4, _excluded4);
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
-                    className: "list-disc pl-5 space-y-1"
-                  }, props));
-                },
-                li: _ref5 => {
-                  let {
-                      node
-                    } = _ref5,
-                    props = _objectWithoutProperties(_ref5, _excluded5);
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
-                    className: "text-gray-600 break-words -my-0.5",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-                      className: "whitespace-pre-wrap block leading-tight py-0.5",
-                      children: props.children
-                    })
-                  });
-                }
-              },
+              components: markdownComponents,
               children: dexAnalysis
             })
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
@@ -62736,7 +62750,7 @@ const Popup = () => {
                   let {
                       node
                     } = _ref6,
-                    props = _objectWithoutProperties(_ref6, _excluded6);
+                    props = _objectWithoutProperties(_ref6, _excluded);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
                     className: "text-lg font-bold text-gray-900 mb-2"
                   }, props));
@@ -62745,7 +62759,7 @@ const Popup = () => {
                   let {
                       node
                     } = _ref7,
-                    props = _objectWithoutProperties(_ref7, _excluded7);
+                    props = _objectWithoutProperties(_ref7, _excluded2);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
                     className: "text-base font-semibold text-gray-900 mb-2"
                   }, props));
@@ -62754,7 +62768,7 @@ const Popup = () => {
                   let {
                       node
                     } = _ref8,
-                    props = _objectWithoutProperties(_ref8, _excluded8);
+                    props = _objectWithoutProperties(_ref8, _excluded3);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
                     className: "text-gray-600 mb-2"
                   }, props));
@@ -62763,7 +62777,7 @@ const Popup = () => {
                   let {
                       node
                     } = _ref9,
-                    props = _objectWithoutProperties(_ref9, _excluded9);
+                    props = _objectWithoutProperties(_ref9, _excluded4);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
                     className: "list-disc pl-5 space-y-1"
                   }, props));
@@ -62772,7 +62786,7 @@ const Popup = () => {
                   let {
                       node
                     } = _ref10,
-                    props = _objectWithoutProperties(_ref10, _excluded10);
+                    props = _objectWithoutProperties(_ref10, _excluded5);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
                     className: "text-gray-600 break-words -my-0.5",
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
@@ -62786,7 +62800,7 @@ const Popup = () => {
                       node,
                       inline
                     } = _ref11,
-                    props = _objectWithoutProperties(_ref11, _excluded11);
+                    props = _objectWithoutProperties(_ref11, _excluded6);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("code", _objectSpread({
                     className: "font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words"
                   }, props));
