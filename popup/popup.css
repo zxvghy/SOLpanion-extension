@@ -213,3 +213,94 @@ button:disabled {
 .full-width-button:hover {
   background: #0056b3;
 }
+
+
+/* Add these styles to your existing CSS */
+.markdown-content {
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.markdown-content h1, .markdown-content h2 {
+  color: #1a202c;
+  margin: 1em 0 0.5em;
+}
+
+.markdown-content h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.markdown-content h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.markdown-content li {
+  margin: 0.25rem 0;
+  word-break: break-word;
+}
+
+.markdown-content code {
+  font-family: monospace;
+  background-color: #e2e8f0;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+.markdown-content p {
+  margin: 0.5rem 0;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.break-words {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.list-disc {
+  list-style-type: disc;
+}
+
+.pl-5 {
+  padding-left: 1.25rem;
+}
+
+/* Add to your existing CSS */
+.prose {
+  max-width: 100%;
+}
+
+.prose-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.prose ul {
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin: 0.25rem 0;
+}
+
+.break-words {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
