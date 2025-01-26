@@ -62162,18 +62162,12 @@ const _excluded = ["node"],
   _excluded3 = ["node"],
   _excluded4 = ["node"],
   _excluded5 = ["node"],
-  _excluded6 = ["node", "inline"],
+  _excluded6 = ["node"],
   _excluded7 = ["node"],
   _excluded8 = ["node"],
   _excluded9 = ["node"],
   _excluded10 = ["node"],
-  _excluded11 = ["node"],
-  _excluded12 = ["node"],
-  _excluded13 = ["node"],
-  _excluded14 = ["node"],
-  _excluded15 = ["node"],
-  _excluded16 = ["node"],
-  _excluded17 = ["node", "inline"];
+  _excluded11 = ["node", "inline"];
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
@@ -62208,6 +62202,7 @@ const Popup = () => {
   const [isDexTokenVisible, setIsDexTokenVisible] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [dexAnalysis, setDexAnalysis] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [isDexAnalyzing, setIsDexAnalyzing] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [pairDetails, setPairDetails] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
 
   // Utility function to validate DEX URL
   const validateDexUrl = url => {
@@ -62265,6 +62260,7 @@ const Popup = () => {
         setDexStatusType('error');
         return;
       }
+      setPairDetails(data.pair);
       const baseToken = data.pair.baseToken;
       console.log('Base token:', baseToken);
       const tokenInfoData = {
@@ -62335,41 +62331,43 @@ const Popup = () => {
     };
     checkDexPage();
   }, [activeTab]);
+
+  // Modified analyze function with complete data
   const analyzeDexToken = async () => {
-    if (!tokenInfo) return;
+    if (!tokenInfo || !pairDetails) return;
     setIsDexAnalyzing(true);
     setDexAnalysis('');
     try {
-      const tokenData = {
-        name: tokenInfo.name,
-        symbol: tokenInfo.symbol,
-        address: tokenInfo.address,
-        chain: chainType,
-        pairAddress: pairAddress
-      };
-      const prompt = `Please analyze this token using this format, make it concise, and you don't need to sound too formal. just make sure the information is concise and easy to understand/interpret. also reduce extra spaces:
-
-      # Token Overview
-      - Name: ${tokenData.name}
-      - Symbol: ${tokenData.symbol}
-      - Address: \`${tokenData.address}\`
-      - Chain: ${tokenData.chain}
-      - Pair Address: \`${tokenData.pairAddress}\`
-      
-      # Security Analysis
-      - Verification Status: [status]
-      - Risk Level: [level]
-      - Security Concerns:
-        - [concern 1]
-        - [concern 2]
-      
-      Market Insights
-      - Overview: [brief market overview]
-      - Trading Activity: [current patterns]
-      - Key Metrics:
-        - Market Cap: [value]
-        - 24h Volume: [value]
-        - Price Volatility: [description]`;
+      var _pairDetails$quoteTok, _pairDetails$priceCha, _pairDetails$volume, _pairDetails$liquidit, _pairDetails$txns, _pairDetails$txns2, _pairDetails$info;
+      const formatNumber = num => num ? `$${Number(num).toLocaleString(undefined, {
+        maximumFractionDigits: 2
+      })}` : 'N/A';
+      const tokenDataString = `
+        Token Address: \`${pairDetails.baseToken.address}\`
+        Chain: ${chainType}
+        Pair Address: \`${pairDetails.pairAddress}\`
+        Price (USD): ${formatNumber(pairDetails.priceUsd)}
+        Price (${(_pairDetails$quoteTok = pairDetails.quoteToken) === null || _pairDetails$quoteTok === void 0 ? void 0 : _pairDetails$quoteTok.symbol}): ${pairDetails.priceNative}
+        24H Change: ${(_pairDetails$priceCha = pairDetails.priceChange) === null || _pairDetails$priceCha === void 0 || (_pairDetails$priceCha = _pairDetails$priceCha.h24) === null || _pairDetails$priceCha === void 0 ? void 0 : _pairDetails$priceCha.toFixed(2)}%
+        24H Volume: ${formatNumber((_pairDetails$volume = pairDetails.volume) === null || _pairDetails$volume === void 0 ? void 0 : _pairDetails$volume.h24)}
+        Liquidity: ${formatNumber((_pairDetails$liquidit = pairDetails.liquidity) === null || _pairDetails$liquidit === void 0 ? void 0 : _pairDetails$liquidit.usd)}
+        FDV: ${formatNumber(pairDetails.fdv)}
+        Created: ${new Date(pairDetails.pairCreatedAt).toLocaleDateString()}
+        Transactions (24H):
+          Buys: ${((_pairDetails$txns = pairDetails.txns) === null || _pairDetails$txns === void 0 || (_pairDetails$txns = _pairDetails$txns.h24) === null || _pairDetails$txns === void 0 ? void 0 : _pairDetails$txns.buys) || 0}
+          Sells: ${((_pairDetails$txns2 = pairDetails.txns) === null || _pairDetails$txns2 === void 0 || (_pairDetails$txns2 = _pairDetails$txns2.h24) === null || _pairDetails$txns2 === void 0 ? void 0 : _pairDetails$txns2.sells) || 0}
+        Token Info:
+          Name: ${pairDetails.baseToken.name}
+          Symbol: ${pairDetails.baseToken.symbol}
+          ${pairDetails.baseToken.verified ? '✓ Verified' : '⚠ Unverified'}
+          Social Links: ${((_pairDetails$info = pairDetails.info) === null || _pairDetails$info === void 0 || (_pairDetails$info = _pairDetails$info.socials) === null || _pairDetails$info === void 0 ? void 0 : _pairDetails$info.join(', ')) || 'None'}`;
+      const messages = [{
+        role: "system",
+        content: `You're a crypto analyst. Analyze this token using EXACTLY this format. Be concise. Highlight risks. Current UTC: ${new Date().toISOString()}`
+      }, {
+        role: "user",
+        content: `Analyze this token using these metrics:\n${tokenDataString}`
+      }];
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -62378,14 +62376,9 @@ const Popup = () => {
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
-          messages: [{
-            role: 'system',
-            content: 'You are a cryptocurrency expert analyzing token information.'
-          }, {
-            role: 'user',
-            content: prompt
-          }],
-          max_tokens: 500
+          messages,
+          temperature: 0.3,
+          max_tokens: 700
         })
       });
       const data = await response.json();
@@ -62603,75 +62596,11 @@ const Popup = () => {
           onClick: handleAnalyze,
           disabled: !prompt.trim() || loading,
           className: `w-full py-3 px-4 rounded-xl font-medium transition-colors
-        ${prompt.trim() && !loading ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`,
+                ${prompt.trim() && !loading ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`,
           children: loading ? 'Analyzing...' : 'Analyze'
         }), result && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "p-4 bg-white border border-gray-200 rounded-xl",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_markdown__WEBPACK_IMPORTED_MODULE_4__.Markdown, {
-            className: "space-y-4",
-            components: {
-              h1: _ref => {
-                let {
-                    node
-                  } = _ref,
-                  props = _objectWithoutProperties(_ref, _excluded);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
-                  className: "text-lg font-bold text-gray-900"
-                }, props));
-              },
-              h2: _ref2 => {
-                let {
-                    node
-                  } = _ref2,
-                  props = _objectWithoutProperties(_ref2, _excluded2);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
-                  className: "text-base font-semibold text-gray-900"
-                }, props));
-              },
-              p: _ref3 => {
-                let {
-                    node
-                  } = _ref3,
-                  props = _objectWithoutProperties(_ref3, _excluded3);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
-                  className: "text-gray-600 leading-relaxed"
-                }, props));
-              },
-              ul: _ref4 => {
-                let {
-                    node
-                  } = _ref4,
-                  props = _objectWithoutProperties(_ref4, _excluded4);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
-                  className: "list-disc pl-5 space-y-1"
-                }, props));
-              },
-              li: _ref5 => {
-                let {
-                    node
-                  } = _ref5,
-                  props = _objectWithoutProperties(_ref5, _excluded5);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
-                  className: "text-gray-600 break-words -my-0.5",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-                    className: "whitespace-pre-wrap block leading-tight py-0.5",
-                    children: props.children
-                  })
-                });
-              },
-              code: _ref6 => {
-                let {
-                    node,
-                    inline
-                  } = _ref6,
-                  props = _objectWithoutProperties(_ref6, _excluded6);
-                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("code", _objectSpread({
-                  className: "font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words"
-                }, props));
-              }
-            },
-            children: result
-          })
+          children: result
         })]
       }), activeTab === 'dex' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
         className: "p-4 space-y-4",
@@ -62735,47 +62664,47 @@ const Popup = () => {
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_markdown__WEBPACK_IMPORTED_MODULE_4__.Markdown, {
               className: "space-y-4",
               components: {
-                h1: _ref7 => {
+                h1: _ref => {
                   let {
                       node
-                    } = _ref7,
-                    props = _objectWithoutProperties(_ref7, _excluded7);
+                    } = _ref,
+                    props = _objectWithoutProperties(_ref, _excluded);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
                     className: "text-lg font-bold text-gray-900"
                   }, props));
                 },
-                h2: _ref8 => {
+                h2: _ref2 => {
                   let {
                       node
-                    } = _ref8,
-                    props = _objectWithoutProperties(_ref8, _excluded8);
+                    } = _ref2,
+                    props = _objectWithoutProperties(_ref2, _excluded2);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
                     className: "text-base font-semibold text-gray-900"
                   }, props));
                 },
-                p: _ref9 => {
+                p: _ref3 => {
                   let {
                       node
-                    } = _ref9,
-                    props = _objectWithoutProperties(_ref9, _excluded9);
+                    } = _ref3,
+                    props = _objectWithoutProperties(_ref3, _excluded3);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
                     className: "text-gray-600 leading-relaxed"
                   }, props));
                 },
-                ul: _ref10 => {
+                ul: _ref4 => {
                   let {
                       node
-                    } = _ref10,
-                    props = _objectWithoutProperties(_ref10, _excluded10);
+                    } = _ref4,
+                    props = _objectWithoutProperties(_ref4, _excluded4);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
                     className: "list-disc pl-5 space-y-1"
                   }, props));
                 },
-                li: _ref11 => {
+                li: _ref5 => {
                   let {
                       node
-                    } = _ref11,
-                    props = _objectWithoutProperties(_ref11, _excluded11);
+                    } = _ref5,
+                    props = _objectWithoutProperties(_ref5, _excluded5);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
                     className: "text-gray-600 break-words -my-0.5",
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
@@ -62803,47 +62732,47 @@ const Popup = () => {
             className: "markdown-content",
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_markdown__WEBPACK_IMPORTED_MODULE_4__.Markdown, {
               components: {
-                h1: _ref12 => {
+                h1: _ref6 => {
                   let {
                       node
-                    } = _ref12,
-                    props = _objectWithoutProperties(_ref12, _excluded12);
+                    } = _ref6,
+                    props = _objectWithoutProperties(_ref6, _excluded6);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", _objectSpread({
                     className: "text-lg font-bold text-gray-900 mb-2"
                   }, props));
                 },
-                h2: _ref13 => {
+                h2: _ref7 => {
                   let {
                       node
-                    } = _ref13,
-                    props = _objectWithoutProperties(_ref13, _excluded13);
+                    } = _ref7,
+                    props = _objectWithoutProperties(_ref7, _excluded7);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", _objectSpread({
                     className: "text-base font-semibold text-gray-900 mb-2"
                   }, props));
                 },
-                p: _ref14 => {
+                p: _ref8 => {
                   let {
                       node
-                    } = _ref14,
-                    props = _objectWithoutProperties(_ref14, _excluded14);
+                    } = _ref8,
+                    props = _objectWithoutProperties(_ref8, _excluded8);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", _objectSpread({
                     className: "text-gray-600 mb-2"
                   }, props));
                 },
-                ul: _ref15 => {
+                ul: _ref9 => {
                   let {
                       node
-                    } = _ref15,
-                    props = _objectWithoutProperties(_ref15, _excluded15);
+                    } = _ref9,
+                    props = _objectWithoutProperties(_ref9, _excluded9);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", _objectSpread({
                     className: "list-disc pl-5 space-y-1"
                   }, props));
                 },
-                li: _ref16 => {
+                li: _ref10 => {
                   let {
                       node
-                    } = _ref16,
-                    props = _objectWithoutProperties(_ref16, _excluded16);
+                    } = _ref10,
+                    props = _objectWithoutProperties(_ref10, _excluded10);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
                     className: "text-gray-600 break-words -my-0.5",
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
@@ -62852,12 +62781,12 @@ const Popup = () => {
                     })
                   });
                 },
-                code: _ref17 => {
+                code: _ref11 => {
                   let {
                       node,
                       inline
-                    } = _ref17,
-                    props = _objectWithoutProperties(_ref17, _excluded17);
+                    } = _ref11,
+                    props = _objectWithoutProperties(_ref11, _excluded11);
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("code", _objectSpread({
                     className: "font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words"
                   }, props));

@@ -22,6 +22,8 @@ const Popup = () => {
   const [isDexTokenVisible, setIsDexTokenVisible] = useState(false);
   const [dexAnalysis, setDexAnalysis] = useState('');
   const [isDexAnalyzing, setIsDexAnalyzing] = useState(false);
+  const [pairDetails, setPairDetails] = useState(null);
+
 
   // Utility function to validate DEX URL
   const validateDexUrl = (url) => {
@@ -75,7 +77,8 @@ const Popup = () => {
         setDexStatusType('error');
         return;
       }
-  
+      
+      setPairDetails(data.pair);
       const baseToken = data.pair.baseToken;
       console.log('Base token:', baseToken);
   
@@ -143,66 +146,61 @@ const Popup = () => {
     checkDexPage();
   }, [activeTab]);
 
-  const analyzeDexToken = async () => {
-    if (!tokenInfo) return;
-    
-    setIsDexAnalyzing(true);
-    setDexAnalysis('');
+// Modified analyze function with complete data
+const analyzeDexToken = async () => {
+  if (!tokenInfo || !pairDetails) return;
   
-    try {
-      const tokenData = {
-        name: tokenInfo.name,
-        symbol: tokenInfo.symbol,
-        address: tokenInfo.address,
-        chain: chainType,
-        pairAddress: pairAddress
-      };
-  
-      const prompt = `Please analyze this token using this format, make it concise, and you don't need to sound too formal. just make sure the information is concise and easy to understand/interpret. also reduce extra spaces:
+  setIsDexAnalyzing(true);
+  setDexAnalysis('');
 
-      # Token Overview
-      - Name: ${tokenData.name}
-      - Symbol: ${tokenData.symbol}
-      - Address: \`${tokenData.address}\`
-      - Chain: ${tokenData.chain}
-      - Pair Address: \`${tokenData.pairAddress}\`
-      
-      # Security Analysis
-      - Verification Status: [status]
-      - Risk Level: [level]
-      - Security Concerns:
-        - [concern 1]
-        - [concern 2]
-      
-      Market Insights
-      - Overview: [brief market overview]
-      - Trading Activity: [current patterns]
-      - Key Metrics:
-        - Market Cap: [value]
-        - 24h Volume: [value]
-        - Price Volatility: [description]`;
-  
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a cryptocurrency expert analyzing token information.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 500
-        })
-      });
+  try {
+    const formatNumber = (num) => 
+      num ? `$${Number(num).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
+
+    const tokenDataString = `
+        Token Address: \`${pairDetails.baseToken.address}\`
+        Chain: ${chainType}
+        Pair Address: \`${pairDetails.pairAddress}\`
+        Price (USD): ${formatNumber(pairDetails.priceUsd)}
+        Price (${pairDetails.quoteToken?.symbol}): ${pairDetails.priceNative}
+        24H Change: ${pairDetails.priceChange?.h24?.toFixed(2)}%
+        24H Volume: ${formatNumber(pairDetails.volume?.h24)}
+        Liquidity: ${formatNumber(pairDetails.liquidity?.usd)}
+        FDV: ${formatNumber(pairDetails.fdv)}
+        Created: ${new Date(pairDetails.pairCreatedAt).toLocaleDateString()}
+        Transactions (24H):
+          Buys: ${pairDetails.txns?.h24?.buys || 0}
+          Sells: ${pairDetails.txns?.h24?.sells || 0}
+        Token Info:
+          Name: ${pairDetails.baseToken.name}
+          Symbol: ${pairDetails.baseToken.symbol}
+          ${pairDetails.baseToken.verified ? '✓ Verified' : '⚠ Unverified'}
+          Social Links: ${pairDetails.info?.socials?.join(', ') || 'None'}`;
+
+    const messages = [
+      {
+        role: "system",
+        content: `You're a crypto analyst. Analyze this token using EXACTLY this format. Be concise. Highlight risks. Current UTC: ${new Date().toISOString()}`
+      },
+      {
+        role: "user",
+        content: `Analyze this token using these metrics:\n${tokenDataString}`
+      }
+    ];
+
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages,
+        temperature: 0.3,
+        max_tokens: 700
+      })
+    });
   
       const data = await response.json();
       if (data.error) {
@@ -391,68 +389,37 @@ const Popup = () => {
 
       {/* Content */}
       <div className="p-4">
-{/* Analyze Tab */}
-{activeTab === 'analyze' && (
-  <div className="space-y-4">
-    <div className="relative">
-      <textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Enter your prompt..."
-        className="w-full h-32 p-3 text-gray-700 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-      />
-      <span className="absolute bottom-2 right-2 text-sm text-gray-400">
-        {prompt.length}
-      </span>
-    </div>
-    <button
-      onClick={handleAnalyze}
-      disabled={!prompt.trim() || loading}
-      className={`w-full py-3 px-4 rounded-xl font-medium transition-colors
-        ${prompt.trim() && !loading
-          ? 'bg-purple-600 hover:bg-purple-700 text-white'
-          : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
-    >
-      {loading ? 'Analyzing...' : 'Analyze'}
-    </button>
-    {result && (
-      <div className="p-4 bg-white border border-gray-200 rounded-xl">
-        <ReactMarkdown
-          className="space-y-4"
-          components={{
-            h1: ({node, ...props}) => (
-              <h1 className="text-lg font-bold text-gray-900" {...props} />
-            ),
-            h2: ({node, ...props}) => (
-              <h2 className="text-base font-semibold text-gray-900" {...props} />
-            ),
-            p: ({node, ...props}) => (
-              <p className="text-gray-600 leading-relaxed" {...props} />
-            ),
-            ul: ({node, ...props}) => (
-              <ul className="list-disc pl-5 space-y-1" {...props} />
-            ),
-            li: ({node, ...props}) => (
-              <li className="text-gray-600 break-words -my-0.5">
-                <span className="whitespace-pre-wrap block leading-tight py-0.5">
-                  {props.children}
-                </span>
-              </li>
-            ),
-            code: ({node, inline, ...props}) => (
-              <code 
-                className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-sm break-words" 
-                {...props} 
+        {/* Analyze Tab */}
+        {activeTab === 'analyze' && (
+          <div className="space-y-4">
+            <div className="relative">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter your prompt..."
+                className="w-full h-32 p-3 text-gray-700 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
-            ),
-          }}
-        >
-          {result}
-        </ReactMarkdown>
-      </div>
-    )}
-  </div>
-)}
+              <span className="absolute bottom-2 right-2 text-sm text-gray-400">
+                {prompt.length}
+              </span>
+            </div>
+            <button
+              onClick={handleAnalyze}
+              disabled={!prompt.trim() || loading}
+              className={`w-full py-3 px-4 rounded-xl font-medium transition-colors
+                ${prompt.trim() && !loading
+                  ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                  : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+            >
+              {loading ? 'Analyzing...' : 'Analyze'}
+            </button>
+            {result && (
+              <div className="p-4 bg-white border border-gray-200 rounded-xl">
+                {result}
+              </div>
+            )}
+          </div>
+        )}
 
     {/* DEX Tab */}
     {activeTab === 'dex' && (
@@ -654,11 +621,14 @@ const Popup = () => {
               </div>
             )}
           </div>
-        )}*/}
+          
+        )}
+          */}
       </div>
     </div>
   );
-}; 
+};
+
 
 // Create root element and render
 const container = document.getElementById('root');
