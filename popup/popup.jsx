@@ -167,8 +167,18 @@ const Popup = () => {
     setDexAnalysis('');
 
     try {
-      const formatNumber = (num) =>
-        num ? `$${Number(num).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
+      const formatNumber = (num) => {
+        if (!num && num !== 0) return 'N/A';
+        
+        // Ensure we handle the number as a float
+        const number = parseFloat(num);
+        
+        // Format with minimum 2 decimal places and maximum 8
+        return `$${number.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 8
+        })}`;
+      };
 
       const tokenDataString = `
         Token Address: \`${pairDetails.baseToken.address}\`
