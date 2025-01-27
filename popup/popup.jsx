@@ -389,10 +389,14 @@ const Popup = () => {
 
   return (
     <div className="w-96 min-h-[600px] bg-gray-50">
-      {/* Header */}
-      <div className="bg-white p-4 shadow-sm">
-        <h1 className="text-xl font-semibold text-gray-900">SolPanion</h1>
-      </div>
+      {/* Header
+      <div className="bg-white p-4 shadow-sm flex justify-center items-center">
+        <img 
+          src={logo} 
+          alt="SolPanion" 
+          className="h-8 w-auto"
+        />
+      </div> */}
 
       {/* Tab Navigation */}
       <div className="flex border-b bg-white">

@@ -681,11 +681,17 @@ video {
 .h-32 {
   height: 8rem;
 }
+.h-8 {
+  height: 2rem;
+}
 .min-h-\\[600px\\] {
   min-height: 600px;
 }
 .w-96 {
   width: 24rem;
+}
+.w-auto {
+  width: auto;
 }
 .w-full {
   width: 100%;
@@ -737,6 +743,12 @@ video {
 }
 .items-start {
   align-items: flex-start;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
 }
 .gap-2 {
   gap: 0.5rem;
@@ -62396,9 +62408,18 @@ const Popup = () => {
     setDexAnalysis('');
     try {
       var _pairDetails$quoteTok, _pairDetails$priceCha, _pairDetails$volume, _pairDetails$liquidit, _pairDetails$txns, _pairDetails$txns2, _pairDetails$info;
-      const formatNumber = num => num ? `$${Number(num).toLocaleString(undefined, {
-        maximumFractionDigits: 2
-      })}` : 'N/A';
+      const formatNumber = num => {
+        if (!num && num !== 0) return 'N/A';
+
+        // Ensure we handle the number as a float
+        const number = parseFloat(num);
+
+        // Format with minimum 2 decimal places and maximum 8
+        return `$${number.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 8
+        })}`;
+      };
       const tokenDataString = `
         Token Address: \`${pairDetails.baseToken.address}\`
         Chain: ${chainType}
@@ -62429,7 +62450,7 @@ const Popup = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${"sk-7d0c29478bff4dd489b25b74f6c21d0a"}`
+          'Authorization': `Bearer ${""}`
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
@@ -62527,7 +62548,7 @@ const Popup = () => {
       });
       const truncatedContent = pageContent.slice(0, 4000); // Use config.MAX_CONTEXT_LENGTH in your actual code
 
-      const dsapiKey = "sk-7d0c29478bff4dd489b25b74f6c21d0a";
+      const dsapiKey = "";
       if (!dsapiKey) {
         throw new Error('DeepSeek API key is missing. Make sure .env is set and webpack is configured.');
       }
@@ -62537,7 +62558,7 @@ const Popup = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${"sk-7d0c29478bff4dd489b25b74f6c21d0a"}`
+          'Authorization': `Bearer ${""}`
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
@@ -62618,12 +62639,6 @@ const Popup = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
     className: "w-96 min-h-[600px] bg-gray-50",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-      className: "bg-white p-4 shadow-sm",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h1", {
-        className: "text-xl font-semibold text-gray-900",
-        children: "SolPanion"
-      })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
       className: "flex border-b bg-white",
       children: ['analyze', 'dex', 'history'].map(tab =>
       /*#__PURE__*/
