@@ -1,8 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "AI Page Assistant",
-  "version": "1.0",
-  "description": "Analyze pages using OpenAI",
+  "name": "Solpanion AI Page Assistant",
+  "version": "1.1",
+  "icons": {
+    "128": "icons/128x128.png"
+  },
+  "description": "Analyze pages using Deepseek",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["https://api.deepseek.com/*", "https://dex-analyzer-api.avgtraderandyyy.workers.dev/*"],
   "action": {
