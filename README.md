@@ -1,6 +1,6 @@
-# **DeepSeek Web Analyzer Chrome Extension**
+# **SOLpanion Chrome Extension**
 
-🚀 **DeepSeek Web Analyzer** is a powerful Chrome extension that leverages the **DeepSeek API** to analyze any webpage. Whether you're researching, debugging, or just curious, this extension provides deep insights into the content and structure of any website.
+[SOLpanion](https://www.solpanion.net/) is a powerful Chrome extension that leverages the **DeepSeek API** to analyze any webpage. Whether you're researching, debugging, or just curious, this extension provides deep insights into the content and structure of any website.
 
 ---
 
