@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import ReactMarkdown from 'react-markdown';
 
+const API_BASE_URL = 'https://dex-analyzer-api.avgtraderandyyy.workers.dev'; // Replace with your actual workers.dev URL
+
 const Popup = () => {
   const [activeTab, setActiveTab] = useState('analyze');
   const [prompt, setPrompt] = useState('');
@@ -169,11 +171,7 @@ const Popup = () => {
     try {
       const formatNumber = (num) => {
         if (!num && num !== 0) return 'N/A';
-        
-        // Ensure we handle the number as a float
         const number = parseFloat(num);
-        
-        // Format with minimum 2 decimal places and maximum 8
         return `$${number.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 8
@@ -200,37 +198,23 @@ const Popup = () => {
           ${pairDetails.baseToken.verified ? '✓ Verified' : '⚠ Unverified'}
           Social Links: ${pairDetails.info?.socials?.join(', ') || 'None'}`;
 
-      const messages = [
-        {
-          role: "system",
-          content: `You're a crypto analyst. Analyze this token using EXACTLY this format. Be concise. Highlight risks. Current UTC: ${new Date().toISOString()}`
-        },
-        {
-          role: "user",
-          content: `Analyze this token using these metrics:\n${tokenDataString}`
-        }
-      ];
-
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      // Call your new API endpoint for token analysis
+      const response = await fetch(`${API_BASE_URL}/api/analyze-token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages,
-          temperature: 0.3,
-          max_tokens: 700
+          tokenData: tokenDataString
         })
       });
 
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error.message);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const analysis = data.choices[0].message.content.trim();
+      const data = await response.json();
+      const analysis = data.result;
       setDexAnalysis(analysis);
 
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -304,43 +288,27 @@ const Popup = () => {
         },
       });
 
-      const truncatedContent = pageContent.slice(0, 4000); // Use config.MAX_CONTEXT_LENGTH in your actual code
+      const truncatedContent = pageContent.slice(0, 4000);
 
-      const dsapiKey = process.env.DEEPSEEK_API_KEY;
-      if (!dsapiKey) {
-        throw new Error('DeepSeek API key is missing. Make sure .env is set and webpack is configured.');
-      }
-
-      // Now call DeepSeek (or OpenAI) with the env-based key
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      // Call your new API endpoint
+      const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful assistant that analyzes webpage content.'
-            },
-            {
-              role: 'user',
-              content: `Page Content: ${truncatedContent}\n\nPrompt: ${prompt}`
-            }
-          ],
-          max_tokens: 500
+          pageContent: truncatedContent,
+          prompt: prompt
         })
       });
 
-
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error.message);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const aiResponse = data.choices[0].message.content.trim();
+      const data = await response.json();
+      const aiResponse = data.result;
+
       if (aiResponse) {
         // Save to history
         const { promptHistory = [] } = await chrome.storage.sync.get('promptHistory');
