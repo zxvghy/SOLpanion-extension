@@ -9,3 +9,5 @@
 - **DeepSeek API Integration**: Utilizes the cutting-edge DeepSeek API for accurate and comprehensive analysis.
 - **User-Friendly Interface**: Simple and intuitive design for seamless user experience.
 - **Fast and Reliable**: Delivers results in seconds without compromising performance.
+- 🌐 **Website**: [solpanion.net](https://www.solpanion.net/)
+- 🐦 **Twitter**: [@SOLpanion](https://x.com/SOLpanion)
